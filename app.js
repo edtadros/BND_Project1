@@ -14,6 +14,9 @@ const bodyParser = require("body-parser");
  */
 const BlockChain = require('./src/blockchain.js');
 
+// Logging added per code review recommendation//
+const logger = require('./src/logger');  // Import logger
+
 class ApplicationServer {
 
 	constructor() {
@@ -46,10 +49,21 @@ class ApplicationServer {
 	}
 
 	start() {
-		let self = this;
-		this.app.listen(this.app.get("port"), () => {
-			console.log(`Server Listening for port: ${self.app.get("port")}`);
-		});
+        let self = this;
+        this.app.listen(this.app.get("port"), () => {
+            console.log(`Server Listening for port: ${self.app.get("port")}`);
+        });
+
+        // Handle Uncaught Exceptions
+        process.on('uncaughtException', (error) => {
+            logger.error('Uncaught Exception:', error);
+        });
+
+        // Handle Unhandled Promise Rejections
+        process.on('unhandledRejection', (error) => {
+            logger.error('Unhandled Promise Rejection:', error);
+        });
+    
 	}
 
 }
