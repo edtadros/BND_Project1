@@ -15,7 +15,7 @@ const bodyParser = require("body-parser");
 const BlockChain = require('./src/blockchain.js');
 
 // Logging added per code review recommendation//
-const logger = require('./src/logger');  // Import logger
+const logger = require('./src/logger.js');  // Import logger
 
 class ApplicationServer {
 

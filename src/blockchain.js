@@ -12,6 +12,8 @@ const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 const hex2ascii = require('hex2ascii');
+// Logging added per code review recommendation//
+const logger = require('./src/logger.js');
 
 class Blockchain {
 
@@ -35,6 +37,7 @@ class Blockchain {
      * Passing as a data `{data: 'Genesis Block'}`
      */
     async initializeChain() {
+        logger.info('blockchain.initializeChain called');
         if( this.height === -1){
             let block = new BlockClass.Block({data: 'Genesis Block'});
             await this._addBlock(block);
@@ -45,6 +48,7 @@ class Blockchain {
      * Utility method that return a Promise that will resolve with the height of the chain
      */
     getChainHeight() {
+        logger.info('blockchain.getChainHeight called');
         return new Promise((resolve, reject) => {
             resolve(this.height);
         });
@@ -63,6 +67,7 @@ class Blockchain {
      * that this method is a private method. 
      */
     _addBlock(block) {
+        logger.info('blockchain._addBlock called');
         let self = this;
         return new Promise(async (resolve, reject) => {
             try{
@@ -97,6 +102,7 @@ class Blockchain {
      * @param {*} address 
      */
     requestMessageOwnershipVerification(address) {
+        logger.info('blockchain.requestMessageOwnershipVerification called');
         return new Promise((resolve) => {
             let message = `${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`;
             resolve(message);
@@ -121,6 +127,7 @@ class Blockchain {
      * @param {*} star 
      */
     submitStar(address, message, signature, star) {
+        logger.info('blockchain.submitStar called');
         let self = this;
         return new Promise(async (resolve, reject) => {
             const messageTime = parseInt(message.split(':')[1]);
@@ -146,6 +153,7 @@ class Blockchain {
      * @param {*} hash 
      */
     getBlockByHash(hash) {
+        logger.info('blockchain.getBlockByHash called');
         let self = this;
         return new Promise((resolve, reject) => {
            const block = self.chain.find(p => p.hash === hash);
@@ -159,6 +167,7 @@ class Blockchain {
      * @param {*} height 
      */
     getBlockByHeight(height) {
+        logger.info('blockchain.getBlockByHeight called');
         let self = this;
         return new Promise((resolve, reject) => {
             const block = self.chain.find(p => p.height === height)[0];
@@ -173,6 +182,7 @@ class Blockchain {
      * @param {*} address 
      */
     getStarsByWalletAddress (address) {
+        logger.info('blockchain.getStarsByWalletAddress called');
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
@@ -203,6 +213,7 @@ class Blockchain {
      * 2. Each Block should check the with the previousBlockHash
      */
     validateChain() {
+        logger.info('blockchain.validateChain called');
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
