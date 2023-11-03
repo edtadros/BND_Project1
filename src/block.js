@@ -37,31 +37,23 @@ class Block {
      */
     validate() {
         let self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             // Save in auxiliary variable the current block hash
-            const currentHash = self.hash;
+            // const currentHash = self.hash;
 
             //Reset the hash attribute to null - the initial state
-            self.hash = null;
+            // self.hash = null;
+
+            // using a spread operator, create a copy of the block and set the hash to null
+            const blockCopy = {...self, hash: null};
+
 
             // Recalculate the hash of the Block
-            const recalcHash = SHA256(JSON.stringify(self)).toString();
+            const recalcHash = SHA256(JSON.stringify(blockCopy)).toString();
 
-            // Compare the stored hash with the freshly created
+            // Compare the original block's hash with the recalculated hash
             // if they are equal, resolve true; otherwise false
-            if(currentHash === recalcHash){
-                // Restore the original hash
-                self.hash = currentHash;
-                
-                // Returning the Block is valid
-                resolve(true);
-            } else {
-                // Restore the original hash
-                self.hash = currentHash;
-                
-                // Returning the Block is not valid
-                resolve(false);
-            }
+            resolve(self.hash === recalcHash);
         });
     }
 
