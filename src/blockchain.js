@@ -40,7 +40,11 @@ class Blockchain {
         logger.info('blockchain.initializeChain called');
         if( this.height === -1){
             let block = new BlockClass.Block({data: 'Genesis Block'});
+            // Log the entire blockchain after initialization
+            logger.info("Blockchain after initialization: ", JSON.stringify(this.chain));
             await this._addBlock(block);
+            // Log the entire blockchain after adding a block
+            logger.info("Blockchain after adding a block: ", JSON.stringify(this.chain));
         }
     }
 
@@ -85,9 +89,13 @@ class Blockchain {
                 if(errors && errors.length > 0){
                     reject(errors);
                 }
-
+                // Log the block data and height
+                logger.info("Block added: " + hex2ascii(block.body));
+                logger.info("Block height: " + block.height);
                 resolve(block);
             } catch (error){
+                // Add Block Error
+                logger.error("Error occurred while adding block:", error);
                 reject(error);
             }
         });
@@ -126,7 +134,7 @@ class Blockchain {
      * @param {*} signature 
      * @param {*} star 
      */
-    submitStar(address, message, signature, star) {
+    /* submitStar(address, message, signature, star) {
         logger.info('blockchain.submitStar called');
         let self = this;
         return new Promise(async (resolve, reject) => {
@@ -144,8 +152,34 @@ class Blockchain {
                 reject(new Error("Message signature has expired."));
             }
         });
-    }
+    } */
 
+    submitStar(address, message, signature, star) {
+        logger.info('blockchain.submitStar called');
+        let self = this;
+        return new Promise(async (resolve, reject) => {
+            try {
+                const messageTime = parseInt(message.split(':')[1]);
+                const currentTime = parseInt(new Date().getTime().toString().slice(0,-3));
+                if((currentTime - messageTime) < 300){
+                    logger.info(`Verifying signature. Message: ${message}, Address: ${address}, Signature: ${signature}`);
+                    if(bitcoinMessage.verify(message, address, signature)){
+                        const block = new BlockClass.Block({owner: address, star: star});
+                        await self._addBlock(block);
+                        resolve(block);
+                    } else {
+                        reject(new Error("Signature verification failed."));
+                    }
+                } else {
+                    reject(new Error("Message signature has expired."));
+                }
+            } catch (error) {
+                logger.error('Error in submitStar: ', error);
+                reject(error);
+            }
+        });
+    }
+    
     /**
      * This method will return a Promise that will resolve with the Block
      *  with the hash passed as a parameter.
@@ -170,7 +204,7 @@ class Blockchain {
         logger.info('blockchain.getBlockByHeight called');
         let self = this;
         return new Promise((resolve, reject) => {
-            const block = self.chain.find(p => p.height === height)[0];
+            const block = self.chain.find(p => p.height === height);
             resolve(block || null)
         });
     }
