@@ -212,27 +212,29 @@ class Blockchain {
      * 1. You should validate each block using `validate`
      * 2. Each Block should check the with the previousBlockHash
      */
-    validateChain() {
+    async validateChain() {
         logger.info('blockchain.validateChain called');
         let self = this;
         let errorLog = [];
-        return new Promise(async (resolve, reject) => {
-            // Validate each block
-            for(let i = 0; i < self.chain.length; i++){
-                const block = self.chain[i];
-                const isValid = await block.validate();
 
+        // Create an array of promises for validating each block in the chain
+        const promises = self.chain.map((block, i) => {
+            return block.validate().then(isValid => {
                 // Check block is valid
-                if(!isValid){
-                    errorLog.push({block: i, error: 'Block validation failed'});
+                if (!isValid) {
+                    errorLog.push({ block: i, error: 'Block validation failed' });
                 }
 
                 // Check previous block hash matches excluding genesis block
-                if(i > 0 && block.previousBlockHash !== self.chain[i - 1].hash){
-                    errorLog.push({block: i, error: "Previous block hash mismatch"});
+                if (i > 0 && block.previousBlockHash !== self.chain[i - 1].hash) {
+                    errorLog.push({ block: i, error: "Previous block hash mismatch" });
                 }
-            }
+            });
         });
+
+        // Use Promise.all to wait for all the promises to resolve
+        await Promise.all(promises);
+        return errorLog;
     }
 
 }
