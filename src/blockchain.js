@@ -13,7 +13,7 @@ const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 const hex2ascii = require('hex2ascii');
 // Logging added per code review recommendation//
-const logger = require('./src/logger.js');
+const logger = require('./logger.js');
 
 class Blockchain {
 
