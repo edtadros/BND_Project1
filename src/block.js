@@ -39,10 +39,7 @@ class Block {
         let self = this;
         return new Promise((resolve) => {
             // Save in auxiliary variable the current block hash
-            // const currentHash = self.hash;
-
-            //Reset the hash attribute to null - the initial state
-            // self.hash = null;
+            const currentHash = self.hash;
 
             // using a spread operator, create a copy of the block and set the hash to null
             const blockCopy = {...self, hash: null};
@@ -53,7 +50,7 @@ class Block {
 
             // Compare the original block's hash with the recalculated hash
             // if they are equal, resolve true; otherwise false
-            resolve(self.hash === recalcHash);
+            resolve(currentHash === recalcHash);
         });
     }
 
